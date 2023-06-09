@@ -25,11 +25,9 @@ public class MyInterceptor implements HandshakeInterceptor {
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                    WebSocketHandler wsHandler, Map<String, Object> attributes) {
-        HttpHeaders headers = request.getHeaders();
-        headers.forEach((k, v) -> {
-            log.info("{}: {}", k, v);
-        });
         log.info("handshake begin.");
+        HttpHeaders headers = request.getHeaders();
+        log.info("origin: {}", headers.get("origin"));
         String hostName = request.getRemoteAddress().getHostName();
         String sessionId = hostName + "#" + ThreadLocalRandom.current().nextInt(1000);
         if (Strings.isNotBlank(sessionId)) {

@@ -7,7 +7,9 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * @author lixin
@@ -34,19 +36,27 @@ public class HttpAuthHandler extends TextWebSocketHandler {
 
     /**
      * 接收消息事件
-     * echo message（回声消息）
      *
      * @param session ...
      * @param message ...
-     * @throws Exception ...
      */
     @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        // 获得客户端传来的消息
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+        messageEcho(session, message);
+    }
+
+    private void messageEcho(WebSocketSession session, TextMessage message) {
         String payload = message.getPayload();
         Object sessionId = session.getAttributes().get("session_id");
         log.info("server 接收到 " + sessionId + " 发送的 " + payload);
-        session.sendMessage(new TextMessage("server 发送给 [" + sessionId + "]消息 " + payload + " " + LocalDateTime.now()));
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String msg = String.format("server receive [%s] from [%s] on [%s]", payload,
+                    sessionId, LocalDateTime.now().format(formatter));
+            session.sendMessage(new TextMessage(msg));
+        } catch (IOException e) {
+            log.error("message echo fail.");
+        }
     }
 
     /**

@@ -6,6 +6,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import java.lang.management.ManagementFactory;
+
 /**
  * @author lixin
  */
@@ -19,7 +21,12 @@ public class SpringBootWebsocketDemoApplication {
 
     @Bean
     public CommandLineRunner commandLineRunner() {
-        return args -> log.info("application started");
+        return args -> {
+            String name = ManagementFactory.getRuntimeMXBean().getName();
+            String[] split = name.split("@");
+            log.info("pid:{}",split[0]);
+            log.info("application started");
+        };
     }
 
 }
